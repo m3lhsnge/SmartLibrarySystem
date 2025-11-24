@@ -37,7 +37,7 @@
   - *Öğrenci, API'leri kullanan işlevsel bir kullanıcı arayüzü geliştirmelidir*
   - *Frontend teknolojisi olarak HTML/CSS + JavaScript, Thymeleaf (Spring) kullanılabilir*
   - *Giriş (login), kitap arama/listeleme, ödünç alma/iade, admin CRUD gibi temel ekranlar yer*
-  - *almalıdır
+  - *almalıdır*
 
  ### Test ve Sunum:
   - *REST API uç noktaları Postman veya Swagger ile test edilmelidir*
