@@ -1,3 +1,7 @@
+
+># Lütfen merak ettiğiniz,düzeltilmesini istediğiniz,"Bu şekilde yapsan daha iyi olur..." gibi durumları belirtiniz.
+
+
 # Proje Adı: 
 ## Akıllı Kütüphane Yönetim Sistemi
 
