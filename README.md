@@ -1,3 +1,7 @@
+
+># Lütfen merak ettiğiniz,düzeltilmesini istediğiniz,"Bu şekilde yapsan daha iyi olur..." gibi durumları belirtiniz.
+
+
 # Proje Adı: 
 ## Akıllı Kütüphane Yönetim Sistemi
 
@@ -31,7 +35,7 @@
   - *E-posta bildirim sistemi (geç iade)*
 
  ### Veritabanı:
-  - *MSSQL, MySQL veya PostgreSQL tercih edilebilir
+  - *MSSQL, MySQL veya PostgreSQL tercih edilebilir*
 
  ### Frontend:
   - *Öğrenci, API'leri kullanan işlevsel bir kullanıcı arayüzü geliştirmelidir*
