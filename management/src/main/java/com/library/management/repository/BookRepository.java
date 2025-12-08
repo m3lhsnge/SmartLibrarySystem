@@ -14,3 +14,5 @@ public interface BookRepository extends JpaRepository<Book, Long> {
 
     List<Book> findByTitleContainingIgnoreCase(String title);
 }
+
+//girilen metodla sql ile bağlantıyı sağlar finadll()---> sql sorgu select*FROM books;

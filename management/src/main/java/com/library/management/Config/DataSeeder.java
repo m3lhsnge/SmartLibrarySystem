@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.*;
 
+//kitaplar otomatik olusturulsun diye bu sınıfı yazdık
+
 @Component
 public class DataSeeder implements CommandLineRunner {
 

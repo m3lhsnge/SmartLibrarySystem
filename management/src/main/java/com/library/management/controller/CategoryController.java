@@ -41,3 +41,4 @@ public class CategoryController {
         return "Category deleted ID: " + id;
     }
 }
+//category sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod

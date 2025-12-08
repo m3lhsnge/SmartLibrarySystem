@@ -39,6 +39,8 @@ public class AuthorController {
     @DeleteMapping("/{id}")
     public String deleteAuthor(@PathVariable Long id) {
         authorService.deleteAuthor(id);
-        return "Yazar başarıyla silindi ID: " + id;
+        return "Author deleted ID: " + id;
     }
 }
+
+//yazar sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod

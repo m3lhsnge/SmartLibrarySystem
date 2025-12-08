@@ -42,3 +42,4 @@ public class BookController {
         return "Book deleted ID: " + id;
     }
 }
+//book sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod

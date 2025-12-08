@@ -12,3 +12,5 @@ public interface BookService {
     Book updateBook(Long id, Book book);
     void deleteBook(Long id);
 }
+
+//controller bu birimdeki fonksiyonları cağırır ama asıl bookserviceimpl çalışır

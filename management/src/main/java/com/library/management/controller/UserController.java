@@ -36,3 +36,5 @@ public class UserController {
         return userService.updateUser(id, user);
     }
 }
+
+//user sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod
