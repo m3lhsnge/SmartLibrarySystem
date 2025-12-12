@@ -28,24 +28,24 @@ public class DataSeeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Veritabanı doluysa işlem yapma
+        // veritabanı doluysa işlem yapma (KİTAPLAR 1 KERE DATABASEDE OLUŞTURULDU TEKRARA ÜST ÜSTE BİNME DURUMLARI YOK)
         if (categoryRepository.count() > 0) {
             return;
         }
 
         System.out.println("--- 📚 Dev Kütüphane Verisi Yükleniyor (5 Kategori, 50 Kitap)... ---");
 
-        // 1. ADIM: KATEGORİLERİ OLUŞTUR
+        //kategori
         Category c1 = createCategory("Dünya Klasikleri", "Dünya edebiyatının en seçkin eserleri");
         Category c2 = createCategory("Bilim Kurgu", "Gelecek, uzay ve teknoloji temalı eserler");
         Category c3 = createCategory("Psikoloji", "İnsan zihni ve davranışları üzerine incelemeler");
         Category c4 = createCategory("Tarih", "Geçmiş olayları ve dönemleri anlatan eserler");
         Category c5 = createCategory("Kişisel Gelişim", "Kendini geliştirme ve başarı odaklı kitaplar");
 
-        // 2. ADIM: YAZARLARI OLUŞTUR (Genel Havuz)
+        // yazar olusturma
         List<Author> authors = createAuthors();
 
-        // 3. ADIM: KİTAPLARI OLUŞTUR (Her Kategoriye 10 Kitap)
+        // kitaplari olusturma
 
         // --- Kategori 1: Dünya Klasikleri ---
         createBook("Suç ve Ceza", "978-1", 1866, "İş Bankası", 687, "A-1", c1, authors.get(0)); // Dostoyevski
@@ -110,8 +110,6 @@ public class DataSeeder implements CommandLineRunner {
         System.out.println("--- ✅ 50 Kitap Başarıyla Yüklendi! ---");
     }
 
-    // --- YARDIMCI METODLAR (Kodu temiz tutmak için) ---
-
     private Category createCategory(String name, String desc) {
         Category c = new Category();
         c.setCategoryName(name);
@@ -151,6 +149,11 @@ public class DataSeeder implements CommandLineRunner {
         b.setShelfLocation(shelf);
         b.setCategory(cat);
         b.setAuthors(new HashSet<>(Collections.singletonList(author)));
+
+      //her kitaptan 10 adet olacak sekilde ayarladim
+        b.setTotalCopies(10);
+        b.setAvailableCopies(10);
+
         bookRepository.save(b);
     }
 }

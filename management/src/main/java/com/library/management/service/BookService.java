@@ -13,4 +13,4 @@ public interface BookService {
     void deleteBook(Long id);
 }
 
-//controller bu birimdeki fonksiyonları cağırır ama asıl bookserviceimpl çalışır
+//service interface i serviceimpl dosyasına implements edilecek

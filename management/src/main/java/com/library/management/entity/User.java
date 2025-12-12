@@ -48,6 +48,9 @@ public class User {
     @Column(name = "updated_at")
     private LocalDateTime updatedArt = LocalDateTime.now();
 
+    @Column(name = "verification_token")
+    private String verificationToken;
+
 
 
 

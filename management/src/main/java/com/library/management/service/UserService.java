@@ -14,5 +14,9 @@ public interface UserService {
 
     User updateUser(Long id, User user);
 
-    User getUserById(Long id); // ID ile bulmayı da ekleyelim, güncelleme için lazım
+    User getUserById(Long id);
+
+    String verifyUser(String token);
+
+    void deleteUser(Long id);
 }

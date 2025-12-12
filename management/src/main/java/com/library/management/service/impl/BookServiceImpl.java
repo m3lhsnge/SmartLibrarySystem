@@ -15,7 +15,7 @@ import java.util.Set;
 public class BookServiceImpl implements BookService {
 
     private final BookRepository bookRepository;
-    private final AuthorRepository authorRepository; // YENİ: Yazarları bulmak için lazım
+    private final AuthorRepository authorRepository; // yazarları bulmak için lazım
 
     // Constructor Injection ile ikisini de alıyoruz
     public BookServiceImpl(BookRepository bookRepository, AuthorRepository authorRepository) {
@@ -30,8 +30,7 @@ public class BookServiceImpl implements BookService {
 
             for (Author author : book.getAuthors()) {
                 if (author.getAuthorId() != null) {
-                    Author existingAuthor = authorRepository.findById(author.getAuthorId())
-                            .orElseThrow(() -> new RuntimeException("Yazar bulunamadı ID: " + author.getAuthorId()));
+                    Author existingAuthor = authorRepository.findById(author.getAuthorId()).orElseThrow(() -> new RuntimeException("author not found ID: " + author.getAuthorId()));
                     managedAuthors.add(existingAuthor);
                 }
             }
