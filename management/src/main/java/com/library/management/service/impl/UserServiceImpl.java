@@ -105,4 +105,34 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+    @Override
+    public void forgotPassword(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Bu mail adresiyle kayıtlı kullanıcı bulunamadı."));
+
+        // Rastgele token üret ve kaydet (VerificationToken alanını tekrar kullanabiliriz)
+        String token = java.util.UUID.randomUUID().toString();
+        user.setVerificationToken(token);
+        userRepository.save(user);
+
+        // Mail at
+        emailService.sendPasswordResetEmail(user.getEmail(), token);
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByVerificationToken(token)
+                .orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş link!"));
+
+        // yeni şifreyi hashle ve kaydet
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+
+        // token'ı temizle
+        user.setVerificationToken(null);
+
+        // kullanıcı pasifse (mail onayı yapmadıysa bile) şifre değiştirdiği için aktif edebiliriz (Opsiyonel)
+        user.setActive(true);
+
+        userRepository.save(user);
+    }
 }

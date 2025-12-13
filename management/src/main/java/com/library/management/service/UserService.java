@@ -19,4 +19,8 @@ public interface UserService {
     String verifyUser(String token);
 
     void deleteUser(Long id);
+
+    void forgotPassword(String email);
+
+    void resetPassword(String token, String newPassword);
 }

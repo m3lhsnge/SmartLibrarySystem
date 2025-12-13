@@ -14,7 +14,7 @@ public interface PenaltyRepository extends JpaRepository<Penalty, Long> {
 
     List<Penalty> findByUser_UserId(Long userId);
 
-    // Bu metod SQL'deki 'sp_CalculateFines' prosedürünü çalıştırır.
+    // bu metod SQL'deki 'sp_CalculateFines' prosedürünü çalıştırır.
     @Modifying
     @Transactional
     @Query(value = "EXEC sp_CalculateFines", nativeQuery = true)

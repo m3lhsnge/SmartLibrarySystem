@@ -28,4 +28,17 @@ public class EmailService {
         mailSender.send(message);
         System.out.println("✅ Mail servisi çalıştı, gönderilen: " + toEmail);
     }
+    public void sendPasswordResetEmail(String toEmail, String token) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom("kutuphane.sistemi@gmail.com");
+        message.setTo(toEmail);
+        message.setSubject("Şifre Sıfırlama Talebi");
+        message.setText("Merhaba,\n\n" +
+                "Şifrenizi sıfırlamak için lütfen aşağıdaki linke tıklayın:\n\n" +
+                "http://localhost:5173/reset-password?token=" + token + "\n\n" +
+                "(Not: Linkteki 5173 portu React uygulamanız içindir)");
+
+        mailSender.send(message);
+        System.out.println("🔑 Şifre sıfırlama maili gönderildi: " + toEmail);
+    }
 }

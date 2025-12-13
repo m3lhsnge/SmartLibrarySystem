@@ -71,4 +71,8 @@ public class Book {
             inverseJoinColumns = @JoinColumn(name = "author_id")
     )
     private Set<Author> authors = new HashSet<>();
+
+    @Column(name = "image_url")
+    private String imageUrl;
+
 }

@@ -20,6 +20,19 @@ public class UserController {
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
+    // sifreyi unutunca degisim maili yollar
+    @PostMapping("/forgot-password")
+    public String forgotPassword(@RequestParam String email) {
+        userService.forgotPassword(email);
+        return "Şifre sıfırlama linki mail adresinize gönderildi.";
+    }
+
+    // sifreyi sıfırlayıp yeni sifreyi kaydetme
+    @PostMapping("/reset-password")
+    public String resetPassword(@RequestParam String token, @RequestParam String newPassword) {
+        userService.resetPassword(token, newPassword);
+        return "Şifreniz başarıyla güncellendi! Giriş yapabilirsiniz.";
+    }
 
     @GetMapping
     public List<User> getAllUsers() {
