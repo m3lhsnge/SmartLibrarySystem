@@ -135,4 +135,23 @@ public class UserServiceImpl implements UserService {
 
         userRepository.save(user);
     }
+
+    @Override
+    public User login(String username, String password) {
+        // kullanıcıyı bulma
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
+
+        // şifreyi kontrol etme
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new RuntimeException("Kullanıcı adı veya şifre hatalı!");
+        }
+
+        // hesap aktifliğini kontrol etme
+        if (!user.isActive()) {
+            throw new RuntimeException("Hesabınız aktif değil! Lütfen mailinizi kontrol edin.");
+        }
+
+        return user; // giriş başarılıysa kullanıcı doner
+    }
 }

@@ -59,6 +59,14 @@ public class UserController {
     public String verifyAccount(@RequestParam String token) {
         return userService.verifyUser(token);
     }//mail doğrulama
+
+    // giriş yapma (login ekranı için)
+    @PostMapping("/login")
+    public User login(@RequestParam String username, @RequestParam String password) {
+        return userService.login(username, password);
+    }
+
 }
+
 
 //user sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod

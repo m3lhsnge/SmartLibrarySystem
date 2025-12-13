@@ -23,4 +23,6 @@ public interface UserService {
     void forgotPassword(String email);
 
     void resetPassword(String token, String newPassword);
+
+    User login(String username, String password);
 }
