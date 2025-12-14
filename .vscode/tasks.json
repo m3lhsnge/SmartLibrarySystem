@@ -1,0 +1,88 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Spring Boot: Run",
+      "type": "shell",
+      "command": "${workspaceFolder}/management/mvnw.cmd",
+      "args": [
+        "spring-boot:run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/management"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": false,
+        "clear": true
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "isBackground": true,
+      "runOptions": {
+        "runOn": "default"
+      }
+    },
+    {
+      "label": "Spring Boot: Clean and Run",
+      "type": "shell",
+      "command": "${workspaceFolder}/management/mvnw.cmd",
+      "args": [
+        "clean",
+        "spring-boot:run"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/management"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new",
+        "focus": false,
+        "clear": true
+      },
+      "group": "build",
+      "isBackground": true
+    },
+    {
+      "label": "Maven: Clean Install",
+      "type": "shell",
+      "command": "${workspaceFolder}/management/mvnw.cmd",
+      "args": [
+        "clean",
+        "install"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/management"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    },
+    {
+      "label": "Maven: Clean",
+      "type": "shell",
+      "command": "${workspaceFolder}/management/mvnw.cmd",
+      "args": [
+        "clean"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}/management"
+      },
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "group": "build"
+    }
+  ]
+}
+

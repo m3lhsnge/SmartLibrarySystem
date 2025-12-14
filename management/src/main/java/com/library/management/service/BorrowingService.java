@@ -7,4 +7,5 @@ public interface BorrowingService {
     Borrowing borrowBook(Long userId, Long bookId, String notes);
     Borrowing returnBook(Long borrowingId);
     List<Borrowing> getAllBorrowings();
+    List<Borrowing> getBorrowingsByUserId(Long userId);
 }

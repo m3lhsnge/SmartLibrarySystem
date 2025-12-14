@@ -1,16 +1,11 @@
 package com.library.management.entity;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import java.time.LocalDateTime;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.List;
 
 @Entity
 @Table(name = "categories")
-@Data
-@NoArgsConstructor
-@AllArgsConstructor
 public class Category {
 
     @Id
@@ -18,12 +13,50 @@ public class Category {
     @Column(name = "category_id")
     private Long categoryId;
 
-    @Column(name = "category_name", unique = true, nullable = false, length = 100)
-    private String categoryName;
+    @Column(name = "name", nullable = false)
+    private String name;
 
+    // EKSİK OLAN KISIM BURASIYDI:
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "created_at")
-    private LocalDateTime createdAt = LocalDateTime.now();
+    @OneToMany(mappedBy = "category")
+    @JsonIgnore
+    private List<Book> books;
+
+    public Category() {
+    }
+
+    public Long getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Long categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    // BU METOTLAR EKSİK OLDUĞU İÇİN HATA ALIYORDUN:
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public List<Book> getBooks() {
+        return books;
+    }
+
+    public void setBooks(List<Book> books) {
+        this.books = books;
+    }
 }

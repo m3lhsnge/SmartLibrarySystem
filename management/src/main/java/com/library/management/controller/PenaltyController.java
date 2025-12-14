@@ -1,7 +1,7 @@
 package com.library.management.controller;
 
 import com.library.management.entity.Penalty;
-import com.library.management.service.impl.PenaltyServiceImpl;
+import com.library.management.service.PenaltyService;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -10,9 +10,9 @@ import java.util.List;
 @RequestMapping("/api/penalties")
 public class PenaltyController {
 
-    private final PenaltyServiceImpl penaltyService;
+    private final PenaltyService penaltyService;
 
-    public PenaltyController(PenaltyServiceImpl penaltyService) {
+    public PenaltyController(PenaltyService penaltyService) {
         this.penaltyService = penaltyService;
     }
 

@@ -1,6 +1,7 @@
 package com.library.management.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -28,17 +29,20 @@ public class Penalty {
     private User user;
 
     @Column(name = "penalty_amount", nullable = false, precision = 10, scale = 2)
+    @JsonProperty("amount")
     private BigDecimal penaltyAmount;
 
     @Column(name = "overdue_days", nullable = false)
     private Integer overdueDays;
 
+    @JsonProperty("paid")
     @Column(name = "is_paid")
     private Boolean isPaid = false;
 
     @Column(name = "payment_date")
     private LocalDateTime paymentDate;
 
+    @JsonProperty("createdAt")
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
 }

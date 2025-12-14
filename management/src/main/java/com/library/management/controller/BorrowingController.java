@@ -37,4 +37,10 @@ public class BorrowingController {
     public List<Borrowing> getAll() {
         return borrowingService.getAllBorrowings();
     }
+
+    // kullanıcının ödünç aldığı kitaplar
+    @GetMapping("/user/{userId}")
+    public List<Borrowing> getBorrowingsByUser(@PathVariable Long userId) {
+        return borrowingService.getBorrowingsByUserId(userId);
+    }
 }

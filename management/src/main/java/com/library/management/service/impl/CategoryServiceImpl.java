@@ -34,8 +34,13 @@ public class CategoryServiceImpl implements CategoryService {
     @Override
     public Category updateCategory(Long id, Category categoryDetails) {
         Category category = getCategoryById(id);
-        category.setCategoryName(categoryDetails.getCategoryName());
+
+        // DİKKAT: getCategoryName() yerine getName() kullanıyoruz
+        category.setName(categoryDetails.getName());
+
+        // Description artık Entity'de var, hata vermez
         category.setDescription(categoryDetails.getDescription());
+
         return categoryRepository.save(category);
     }
 

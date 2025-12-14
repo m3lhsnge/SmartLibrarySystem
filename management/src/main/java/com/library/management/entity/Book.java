@@ -1,6 +1,7 @@
 package com.library.management.entity;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -11,7 +12,7 @@ import java.util.Set;
 
 @Entity
 @Table(name = "books")
-@Data
+@Data // Lombok bu anotasyon sayesinde setFeatured, getFeatured metodlarını otomatik oluşturur
 @NoArgsConstructor
 @AllArgsConstructor
 public class Book {
@@ -38,25 +39,27 @@ public class Book {
     private String publisher;
 
     @Column(name = "language", length = 50)
-    private String language = "Turkish";
+    private String language = "Türkçe";
 
     @Column(name = "page_count")
     private Integer pageCount;
 
+    // EKSİK OLAN ALANLAR BUNLARDI:
     @Column(name = "total_copies")
-    private Integer totalCopies = 1;
+    private Integer totalCopies = 10;
 
     @Column(name = "available_copies")
-    private Integer availableCopies = 1;
+    private Integer availableCopies = 10;
+
+    // DataSeeder'ın aradığı alan tam olarak bu:
+    @Column(name = "is_featured")
+    private boolean isFeatured = false;
 
     @Column(name = "shelf_location", length = 50)
     private String shelfLocation;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
-
-    @Column(name = "cover_image_url", length = 255)
-    private String coverImageUrl;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt = LocalDateTime.now();
@@ -73,6 +76,6 @@ public class Book {
     private Set<Author> authors = new HashSet<>();
 
     @Column(name = "image_url")
+    @JsonProperty("imageUrl")
     private String imageUrl;
-
 }

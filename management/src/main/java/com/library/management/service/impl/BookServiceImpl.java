@@ -66,6 +66,11 @@ public class BookServiceImpl implements BookService {
         existingBook.setPublicationYear(bookDetails.getPublicationYear());
         existingBook.setDescription(bookDetails.getDescription());
         existingBook.setShelfLocation(bookDetails.getShelfLocation());
+        existingBook.setLanguage(bookDetails.getLanguage());
+        existingBook.setImageUrl(bookDetails.getImageUrl());
+        existingBook.setTotalCopies(bookDetails.getTotalCopies());
+        existingBook.setAvailableCopies(bookDetails.getAvailableCopies());
+        existingBook.setFeatured(bookDetails.isFeatured());
 
         if (bookDetails.getCategory() != null) {
             existingBook.setCategory(bookDetails.getCategory());

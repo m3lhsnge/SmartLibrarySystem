@@ -149,7 +149,19 @@ public class UserServiceImpl implements UserService {
 
         // hesap aktifliğini kontrol etme
         if (!user.isActive()) {
-            throw new RuntimeException("Hesabınız aktif değil! Lütfen mailinizi kontrol edin.");
+            // Pasif kullanıcı için yeni doğrulama token'ı oluştur
+            String token = UUID.randomUUID().toString();
+            user.setVerificationToken(token);
+            userRepository.save(user);
+
+            // Aktifleştirme maili gönder
+            try {
+                emailService.sendVerificationEmail(user.getEmail(), token);
+            } catch (Exception e) {
+                System.out.println("Mail Hatası: " + e.getMessage());
+            }
+
+            throw new RuntimeException("Hesabınız aktif değil! Mail adresinize gönderilen aktifleştirme linkine tıklayarak hesabınızı aktif edebilirsiniz.");
         }
 
         return user; // giriş başarılıysa kullanıcı doner

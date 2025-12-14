@@ -2,6 +2,7 @@ package com.library.management.controller;
 
 import com.library.management.entity.Book;
 import com.library.management.service.BookService;
+import com.library.management.repository.BookRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -11,9 +12,11 @@ import java.util.List;
 public class BookController {
 
     private final BookService bookService;
+    private final BookRepository bookRepository;
 
-    public BookController(BookService bookService) {
+    public BookController(BookService bookService, BookRepository bookRepository) {
         this.bookService = bookService;
+        this.bookRepository = bookRepository;
     }
 
     @PostMapping
@@ -41,5 +44,20 @@ public class BookController {
         bookService.deleteBook(id);
         return "Book deleted ID: " + id;
     }
+
+    // --- YENİ ENDPOINTLER ---
+
+    // Editörün Seçimi
+    @GetMapping("/featured")
+    public List<Book> getFeaturedBooks() {
+        return bookRepository.findByIsFeaturedTrue();
+    }
+
+    // Son Eklenenler
+    @GetMapping("/latest")
+    public List<Book> getLatestBooks() {
+        return bookRepository.findTop10ByOrderByCreatedAtDesc();
+    }
 }
+
 //book sınıfının postman uzerinden post get delete put methodlarını kullanılmasını sağlayan kod

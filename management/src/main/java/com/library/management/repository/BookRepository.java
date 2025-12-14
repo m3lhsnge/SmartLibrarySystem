@@ -9,10 +9,12 @@ import java.util.List;
 @Repository
 public interface BookRepository extends JpaRepository<Book, Long> {
 
-
     Optional<Book> findByIsbn(String isbn);
 
-    List<Book> findByTitleContainingIgnoreCase(String title);
-}
+    // YENİ: Editörün Seçtikleri
+    List<Book> findByIsFeaturedTrue();
 
+    // YENİ: En son eklenen 10 kitap
+    List<Book> findTop10ByOrderByCreatedAtDesc();
+}
 //girilen metodla sql ile bağlantıyı sağlar finadll()---> sql sorgu select*FROM books;

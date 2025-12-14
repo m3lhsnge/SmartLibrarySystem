@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Spring Boot: ManagementApplication",
+      "request": "launch",
+      "mainClass": "com.library.management.ManagementApplication",
+      "projectName": "management",
+      "args": "",
+      "envFile": "${workspaceFolder}/.env",
+      "cwd": "${workspaceFolder}/management"
+    }
+  ]
+}
+

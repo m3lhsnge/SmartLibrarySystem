@@ -28,14 +28,17 @@ public class AuthorServiceImpl implements AuthorService {
 
     @Override
     public Author getAuthorById(Long id) {
-        return authorRepository.findById(id).orElseThrow(() -> new RuntimeException("Author not found ID: " + id));
+        return authorRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Author not found ID: " + id));
     }
 
     @Override
     public Author updateAuthor(Long id, Author authorDetails) {
-
+        // Önce veritabanındaki mevcut yazarı buluyoruz
         Author existingAuthor = getAuthorById(id);
-        existingAuthor.setAuthorName(authorDetails.getAuthorName());
+
+        // Şimdi gelen yeni bilgilerle güncelliyoruz
+        existingAuthor.setName(authorDetails.getName());
         existingAuthor.setBirthYear(authorDetails.getBirthYear());
         existingAuthor.setNationality(authorDetails.getNationality());
         existingAuthor.setBiography(authorDetails.getBiography());
@@ -47,6 +50,4 @@ public class AuthorServiceImpl implements AuthorService {
     public void deleteAuthor(Long id) {
         authorRepository.deleteById(id);
     }
-
-
 }
