@@ -25,8 +25,22 @@ const Home = () => {
   const [adminUsers, setAdminUsers] = useState([])
   const [adminAuthors, setAdminAuthors] = useState([])
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('book')
+  const [modalType, setModalType] = useState('book') // 'book' | 'category' | 'user'
   const [editingItem, setEditingItem] = useState(null)
+  const [categoryForm, setCategoryForm] = useState({
+    name: '',
+    description: ''
+  })
+  const [userForm, setUserForm] = useState({
+    username: '',
+    fullName: '',
+    email: '',
+    phone: '',
+    role: 'STUDENT',
+    password: '',
+    active: true
+  })
+  const [saving, setSaving] = useState(false)
   const [bookForm, setBookForm] = useState({
     title: '',
     isbn: '',
@@ -338,6 +352,60 @@ const Home = () => {
       loadAllBooksForSearch()
     } catch (error) {
       alert('Silme işlemi başarısız: ' + error.message)
+    }
+  }
+
+  const handleCategorySubmit = async (e) => {
+    e.preventDefault()
+    try {
+      setSaving(true)
+      if (editingItem && modalType === 'category') {
+        await categoriesAPI.update(editingItem.categoryId, {
+          name: categoryForm.name,
+          description: categoryForm.description
+        })
+      } else {
+        await categoriesAPI.create({
+          name: categoryForm.name,
+          description: categoryForm.description
+        })
+      }
+      setShowModal(false)
+      setEditingItem(null)
+      await loadAdminData()
+    } catch (error) {
+      alert('Kategori kaydedilirken hata: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleUserSubmit = async (e) => {
+    e.preventDefault()
+    try {
+      setSaving(true)
+      const payload = {
+        username: userForm.username,
+        fullName: userForm.fullName,
+        email: userForm.email,
+        phone: userForm.phone,
+        role: userForm.role,
+        passwordHash: userForm.password || editingItem?.passwordHash || '',
+        active: userForm.active
+      }
+
+      if (editingItem && modalType === 'user') {
+        await usersAPI.update(editingItem.userId, payload)
+      } else {
+        await usersAPI.create(payload)
+      }
+      setShowModal(false)
+      setEditingItem(null)
+      await loadAdminData()
+    } catch (error) {
+      alert('Kullanıcı kaydedilirken hata: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setSaving(false)
     }
   }
 
@@ -1282,6 +1350,10 @@ const Home = () => {
                   onClick={() => {
                     setModalType('category')
                     setEditingItem(null)
+                    setCategoryForm({
+                      name: '',
+                      description: ''
+                    })
                     setShowModal(true)
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
@@ -1304,6 +1376,10 @@ const Home = () => {
                         onClick={() => {
                           setModalType('category')
                           setEditingItem(category)
+                          setCategoryForm({
+                            name: category.name || '',
+                            description: category.description || ''
+                          })
                           setShowModal(true)
                         }}
                         className="bg-orange-primary hover:bg-orange-dark text-white px-3 py-1 rounded text-sm transition-colors"
@@ -1334,6 +1410,15 @@ const Home = () => {
                   onClick={() => {
                     setModalType('user')
                     setEditingItem(null)
+                    setUserForm({
+                      username: '',
+                      fullName: '',
+                      email: '',
+                      phone: '',
+                      role: 'STUDENT',
+                      password: '',
+                      active: true
+                    })
                     setShowModal(true)
                   }}
                   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
@@ -1379,6 +1464,15 @@ const Home = () => {
                               onClick={() => {
                                 setModalType('user')
                                 setEditingItem(u)
+                                setUserForm({
+                                  username: u.username || '',
+                                  fullName: u.fullName || '',
+                                  email: u.email || '',
+                                  phone: u.phone || '',
+                                  role: u.role || 'STUDENT',
+                                  password: '',
+                                  active: u.active ?? true
+                                })
                                 setShowModal(true)
                               }}
                               className="bg-orange-primary hover:bg-orange-dark text-white px-3 py-1 rounded text-sm transition-colors"
@@ -1597,47 +1691,179 @@ const Home = () => {
                       </div>
                     </form>
                   ) : modalType === 'category' ? (
-                    <div>
-                      <p className="text-gray-400 mb-4">Kategori formu buraya eklenecek</p>
-                      <div className="flex gap-2">
+                    <form onSubmit={handleCategorySubmit} className="space-y-4">
+                      <div>
+                        <label className="block text-gray-300 mb-2">Kategori Adı *</label>
+                        <input
+                          type="text"
+                          value={categoryForm.name}
+                          onChange={(e) =>
+                            setCategoryForm((prev) => ({ ...prev, name: e.target.value }))
+                          }
+                          className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label className="block text-gray-300 mb-2">Açıklama</label>
+                        <textarea
+                          value={categoryForm.description}
+                          onChange={(e) =>
+                            setCategoryForm((prev) => ({
+                              ...prev,
+                              description: e.target.value,
+                            }))
+                          }
+                          className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          rows="3"
+                          placeholder="Kategori açıklaması..."
+                        />
+                      </div>
+                      <div className="flex gap-2 pt-4 border-t border-orange-primary/30">
                         <button
+                          type="button"
                           onClick={() => setShowModal(false)}
                           className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
                         >
                           İptal
                         </button>
                         <button
-                          onClick={() => {
-                            setShowModal(false)
-                            loadAdminData()
-                          }}
-                          className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors"
+                          type="submit"
+                          disabled={saving}
+                          className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Kaydet
+                          {saving ? 'Kaydediliyor...' : editingItem ? 'Güncelle' : 'Ekle'}
                         </button>
                       </div>
-                    </div>
+                    </form>
                   ) : (
-                    <div>
-                      <p className="text-gray-400 mb-4">Kullanıcı formu buraya eklenecek</p>
-                      <div className="flex gap-2">
+                    <form onSubmit={handleUserSubmit} className="space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-300 mb-2">Kullanıcı Adı *</label>
+                          <input
+                            type="text"
+                            value={userForm.username}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                username: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 mb-2">Ad Soyad *</label>
+                          <input
+                            type="text"
+                            value={userForm.fullName}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                fullName: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 mb-2">Email *</label>
+                          <input
+                            type="email"
+                            value={userForm.email}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                email: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                            required
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 mb-2">Telefon</label>
+                          <input
+                            type="text"
+                            value={userForm.phone}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                phone: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          />
+                        </div>
+                        {!editingItem && (
+                          <div>
+                            <label className="block text-gray-300 mb-2">Şifre *</label>
+                            <input
+                              type="password"
+                              value={userForm.password}
+                              onChange={(e) =>
+                                setUserForm((prev) => ({
+                                  ...prev,
+                                  password: e.target.value,
+                                }))
+                              }
+                              className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                              required
+                            />
+                          </div>
+                        )}
+                        <div>
+                          <label className="block text-gray-300 mb-2">Rol *</label>
+                          <select
+                            value={userForm.role}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                role: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                            required
+                          >
+                            <option value="ADMIN">ADMIN</option>
+                            <option value="STUDENT">STUDENT</option>
+                          </select>
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={userForm.active}
+                            onChange={(e) =>
+                              setUserForm((prev) => ({
+                                ...prev,
+                                active: e.target.checked,
+                              }))
+                            }
+                            className="w-5 h-5 text-orange-primary bg-gray-800 border-orange-primary/30 rounded focus:ring-orange-primary"
+                          />
+                          <label className="ml-2 text-gray-300">Aktif</label>
+                        </div>
+                      </div>
+                      <div className="flex gap-2 pt-4 border-t border-orange-primary/30">
                         <button
+                          type="button"
                           onClick={() => setShowModal(false)}
                           className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
                         >
                           İptal
                         </button>
                         <button
-                          onClick={() => {
-                            setShowModal(false)
-                            loadAdminData()
-                          }}
-                          className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors"
+                          type="submit"
+                          disabled={saving}
+                          className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                         >
-                          Kaydet
+                          {saving ? 'Kaydediliyor...' : editingItem ? 'Güncelle' : 'Ekle'}
                         </button>
                       </div>
-                    </div>
+                    </form>
                   )}
                 </div>
               </div>

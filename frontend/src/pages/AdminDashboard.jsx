@@ -13,6 +13,8 @@ const AdminDashboard = () => {
   const [showModal, setShowModal] = useState(false)
   const [modalType, setModalType] = useState('book') // 'book', 'category', 'user'
   const [editingItem, setEditingItem] = useState(null)
+  const [formData, setFormData] = useState({})
+  const [saving, setSaving] = useState(false)
   const { user, logout } = useAuth()
   const navigate = useNavigate()
 
@@ -60,13 +62,113 @@ const AdminDashboard = () => {
   const handleEdit = (type, item) => {
     setModalType(type)
     setEditingItem(item)
+    // Düzenleme için mevcut değerleri formState'e aktar
+    if (type === 'category') {
+      setFormData({
+        name: item.name || '',
+        description: item.description || '',
+      })
+    } else if (type === 'user') {
+      setFormData({
+        username: item.username || '',
+        fullName: item.fullName || '',
+        email: item.email || '',
+        phone: item.phone || '',
+        role: item.role || 'STUDENT',
+        active: item.active ?? true,
+      })
+    } else if (type === 'book') {
+      setFormData({
+        title: item.title || '',
+        isbn: item.isbn || '',
+        publicationYear: item.publicationYear || '',
+      })
+    } else {
+      setFormData({})
+    }
     setShowModal(true)
   }
 
   const handleCreate = (type) => {
     setModalType(type)
     setEditingItem(null)
+    // Yeni kayıt için boş form
+    if (type === 'category') {
+      setFormData({
+        name: '',
+        description: '',
+      })
+    } else if (type === 'user') {
+      setFormData({
+        username: '',
+        fullName: '',
+        email: '',
+        phone: '',
+        role: 'STUDENT',
+        password: '',
+        active: true,
+      })
+    } else if (type === 'book') {
+      setFormData({
+        title: '',
+        isbn: '',
+        publicationYear: '',
+      })
+    } else {
+      setFormData({})
+    }
     setShowModal(true)
+  }
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target
+    setFormData((prev) => ({
+      ...prev,
+      [name]: type === 'checkbox' ? checked : value,
+    }))
+  }
+
+  const handleSubmit = async () => {
+    try {
+      setSaving(true)
+      if (modalType === 'category') {
+        if (editingItem) {
+          await categoriesAPI.update(editingItem.categoryId, formData)
+        } else {
+          await categoriesAPI.create(formData)
+        }
+      } else if (modalType === 'user') {
+        const payload = {
+          username: formData.username,
+          fullName: formData.fullName,
+          email: formData.email,
+          phone: formData.phone,
+          role: formData.role,
+          // Backend tarafında passwordHash bekleniyor, yeni user için basit bir alan kullanıyoruz
+          passwordHash: formData.password || editingItem?.passwordHash || '',
+          active: formData.active,
+        }
+        if (editingItem) {
+          await usersAPI.update(editingItem.userId, payload)
+        } else {
+          await usersAPI.create(payload)
+        }
+      } else if (modalType === 'book') {
+        if (editingItem) {
+          await booksAPI.update(editingItem.bookId, formData)
+        } else {
+          await booksAPI.create(formData)
+        }
+      }
+      setShowModal(false)
+      setEditingItem(null)
+      setFormData({})
+      await loadData()
+    } catch (error) {
+      alert('Kaydetme işlemi başarısız: ' + (error.response?.data?.message || error.message))
+    } finally {
+      setSaving(false)
+    }
   }
 
   return (
@@ -186,7 +288,15 @@ const AdminDashboard = () => {
             {activeTab === 'users' && 'Kullanıcılar'}
           </h2>
           <button
-            onClick={() => handleCreate(activeTab.slice(0, -1))}
+            onClick={() =>
+              handleCreate(
+                activeTab === 'books'
+                  ? 'book'
+                  : activeTab === 'categories'
+                  ? 'category'
+                  : 'user'
+              )
+            }
             className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
           >
             + Yeni Ekle
@@ -317,9 +427,153 @@ const AdminDashboard = () => {
             <h3 className="text-xl font-bold text-orange-primary mb-4">
               {editingItem ? 'Düzenle' : 'Yeni Ekle'}
             </h3>
-            <p className="text-gray-400 mb-4">
-              Form detayları buraya eklenebilir. Şimdilik basit bir yapı.
-            </p>
+
+            {/* Kategori Formu */}
+            {modalType === 'category' && (
+              <div className="space-y-4 mb-4">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Kategori Adı</label>
+                  <input
+                    type="text"
+                    name="name"
+                    value={formData.name || ''}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Açıklama</label>
+                  <textarea
+                    name="description"
+                    value={formData.description || ''}
+                    onChange={handleChange}
+                    rows={3}
+                    className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Kullanıcı Formu */}
+            {modalType === 'user' && (
+              <div className="space-y-4 mb-4">
+                <div className="grid grid-cols-1 gap-4">
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Kullanıcı Adı</label>
+                    <input
+                      type="text"
+                      name="username"
+                      value={formData.username || ''}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Ad Soyad</label>
+                    <input
+                      type="text"
+                      name="fullName"
+                      value={formData.fullName || ''}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Email</label>
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email || ''}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Telefon</label>
+                    <input
+                      type="text"
+                      name="phone"
+                      value={formData.phone || ''}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                    />
+                  </div>
+                  {!editingItem && (
+                    <div>
+                      <label className="block text-sm text-gray-300 mb-1">Şifre</label>
+                      <input
+                        type="password"
+                        name="password"
+                        value={formData.password || ''}
+                        onChange={handleChange}
+                        className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <label className="block text-sm text-gray-300 mb-1">Rol</label>
+                    <select
+                      name="role"
+                      value={formData.role || 'STUDENT'}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                    >
+                      <option value="ADMIN">ADMIN</option>
+                      <option value="STUDENT">STUDENT</option>
+                    </select>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <input
+                      id="active"
+                      type="checkbox"
+                      name="active"
+                      checked={!!formData.active}
+                      onChange={handleChange}
+                      className="h-4 w-4 text-orange-primary focus:ring-orange-primary border-gray-700 bg-gray-800"
+                    />
+                    <label htmlFor="active" className="text-sm text-gray-300">
+                      Aktif
+                    </label>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Kitap Formu (Basitleştirilmiş) */}
+            {modalType === 'book' && (
+              <div className="space-y-4 mb-4">
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Kitap Adı</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={formData.title || ''}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">ISBN</label>
+                  <input
+                    type="text"
+                    name="isbn"
+                    value={formData.isbn || ''}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm text-gray-300 mb-1">Basım Yılı</label>
+                  <input
+                    type="number"
+                    name="publicationYear"
+                    value={formData.publicationYear || ''}
+                    onChange={handleChange}
+                    className="w-full px-3 py-2 rounded bg-gray-800 text-white border border-gray-700 focus:outline-none focus:border-orange-primary"
+                  />
+                </div>
+              </div>
+            )}
             <div className="flex gap-2">
               <button
                 onClick={() => setShowModal(false)}
@@ -328,14 +582,11 @@ const AdminDashboard = () => {
                 İptal
               </button>
               <button
-                onClick={() => {
-                  // Form submit işlemi
-                  setShowModal(false)
-                  loadData()
-                }}
-                className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors"
+                onClick={handleSubmit}
+                disabled={saving}
+                className="flex-1 bg-orange-primary hover:bg-orange-dark disabled:opacity-60 disabled:cursor-not-allowed text-white px-4 py-2 rounded transition-colors"
               >
-                Kaydet
+                {saving ? 'Kaydediliyor...' : 'Kaydet'}
               </button>
             </div>
           </div>

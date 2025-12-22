@@ -51,8 +51,9 @@ public class Book {
     @Column(name = "available_copies")
     private Integer availableCopies = 10;
 
-    // DataSeeder'ın aradığı alan tam olarak bu:
+    // DataSeeder'ın aradığı alan tam olarak bu editörün seçimi için kullanılıyor:
     @Column(name = "is_featured")
+    @JsonProperty("isFeatured") // Frontend ile aynı isimde JSON alanı kullan
     private boolean isFeatured = false;
 
     @Column(name = "shelf_location", length = 50)

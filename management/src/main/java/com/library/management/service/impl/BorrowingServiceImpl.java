@@ -52,7 +52,8 @@ public class BorrowingServiceImpl implements BorrowingService {
         borrowing.setUser(user);
         borrowing.setBook(book);
         borrowing.setBorrowDate(LocalDateTime.now());
-        borrowing.setDueDate(LocalDateTime.now().plusDays(15)); // 15 gün süre
+        // DEMO İÇİN: Ödünç süresini 1 dakikaya düşürdük (sunum sonrası tekrar gün yapabilirsiniz)
+        borrowing.setDueDate(LocalDateTime.now().plusMinutes(1));
         borrowing.setStatus(BorrowingStatus.BORROWED);
         borrowing.setNotes(notes);
 
