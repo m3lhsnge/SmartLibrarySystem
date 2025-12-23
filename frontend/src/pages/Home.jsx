@@ -24,12 +24,20 @@ const Home = () => {
   const [adminCategories, setAdminCategories] = useState([])
   const [adminUsers, setAdminUsers] = useState([])
   const [adminAuthors, setAdminAuthors] = useState([])
+  const [adminBorrowings, setAdminBorrowings] = useState([])
+  const [adminPenalties, setAdminPenalties] = useState([])
   const [showModal, setShowModal] = useState(false)
-  const [modalType, setModalType] = useState('book') // 'book' | 'category' | 'user'
+  const [modalType, setModalType] = useState('book') // 'book' | 'category' | 'user' | 'author'
   const [editingItem, setEditingItem] = useState(null)
   const [categoryForm, setCategoryForm] = useState({
     name: '',
     description: ''
+  })
+  const [authorForm, setAuthorForm] = useState({
+    name: '',
+    birthYear: '',
+    nationality: '',
+    biography: ''
   })
   const [userForm, setUserForm] = useState({
     username: '',
@@ -190,6 +198,15 @@ const Home = () => {
       } else if (adminTab === 'users') {
         const res = await usersAPI.getAll()
         setAdminUsers(res.data || [])
+      } else if (adminTab === 'authors') {
+        const res = await authorsAPI.getAll()
+        setAdminAuthors(res.data || [])
+      } else if (adminTab === 'borrowings') {
+        const res = await borrowingsAPI.getAll()
+        setAdminBorrowings(res.data || [])
+      } else if (adminTab === 'penalties') {
+        const res = await penaltiesAPI.getAll()
+        setAdminPenalties(res.data || [])
       }
     } catch (error) {
       console.error('Veri yüklenirken hata:', error)
@@ -346,6 +363,8 @@ const Home = () => {
         await categoriesAPI.delete(id)
       } else if (type === 'user') {
         await usersAPI.delete(id)
+      } else if (type === 'author') {
+        await authorsAPI.delete(id)
       }
       loadAdminData()
       loadInitialData()
@@ -475,6 +494,53 @@ const Home = () => {
     })
   }
 
+  const filterAuthorsBySearch = (authors) => {
+    if (!searchQuery.trim()) return authors
+
+    const query = searchQuery.toLowerCase().trim()
+    return authors.filter((a) => {
+      const name = a.name?.toLowerCase() || ''
+      const nationality = a.nationality?.toLowerCase() || ''
+
+      return (
+        name.includes(query) ||
+        nationality.includes(query)
+      )
+    })
+  }
+
+  const filterBorrowingsBySearch = (borrowings) => {
+    if (!searchQuery.trim()) return borrowings
+
+    const query = searchQuery.toLowerCase().trim()
+    return borrowings.filter((b) => {
+      const userName = (b.user?.fullName || b.user?.username || '').toLowerCase()
+      const bookTitle = b.book?.title?.toLowerCase() || ''
+      const status = b.status?.toLowerCase() || ''
+
+      return (
+        userName.includes(query) ||
+        bookTitle.includes(query) ||
+        status.includes(query)
+      )
+    })
+  }
+
+  const filterPenaltiesBySearch = (penalties) => {
+    if (!searchQuery.trim()) return penalties
+
+    const query = searchQuery.toLowerCase().trim()
+    return penalties.filter((p) => {
+      const userName = (p.user?.fullName || p.user?.username || '').toLowerCase()
+      const bookTitle = p.borrowing?.book?.title?.toLowerCase() || ''
+
+      return (
+        userName.includes(query) ||
+        bookTitle.includes(query)
+      )
+    })
+  }
+
   // Arama placeholder'ını belirle
   const getSearchPlaceholder = () => {
     if (!user) {
@@ -492,6 +558,15 @@ const Home = () => {
       }
       if (adminTab === 'categories') {
         return "Kategori adı veya açıklama ile ara..."
+      }
+      if (adminTab === 'authors') {
+        return "Yazar adı veya ülke ile ara..."
+      }
+      if (adminTab === 'borrowings') {
+        return "Kullanıcı adı, kitap adı veya durum ile ara..."
+      }
+      if (adminTab === 'penalties') {
+        return "Kullanıcı adı veya kitap adı ile ara..."
       }
       return "Kitap adı, yazar, kategori, ISBN veya yayınevi ile ara..."
     }
@@ -701,6 +776,54 @@ const Home = () => {
                     }`}
                   >
                     Kullanıcılar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAdminTab('borrowings')
+                      setSelectedCategory(null)
+                      setFilteredBooks([])
+                      setSearchQuery('')
+                      loadAdminData()
+                    }}
+                    className={`px-6 py-3 font-medium transition-colors ${
+                      adminTab === 'borrowings'
+                        ? 'bg-orange-primary text-white'
+                        : 'text-gray-400 hover:text-orange-primary hover:bg-gray-900'
+                    }`}
+                  >
+                    Ödünçler
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAdminTab('penalties')
+                      setSelectedCategory(null)
+                      setFilteredBooks([])
+                      setSearchQuery('')
+                      loadAdminData()
+                    }}
+                    className={`px-6 py-3 font-medium transition-colors ${
+                      adminTab === 'penalties'
+                        ? 'bg-orange-primary text-white'
+                        : 'text-gray-400 hover:text-orange-primary hover:bg-gray-900'
+                    }`}
+                  >
+                    Cezalar
+                  </button>
+                  <button
+                    onClick={() => {
+                      setAdminTab('authors')
+                      setSelectedCategory(null)
+                      setFilteredBooks([])
+                      setSearchQuery('')
+                      loadAdminData()
+                    }}
+                    className={`px-6 py-3 font-medium transition-colors ${
+                      adminTab === 'authors'
+                        ? 'bg-orange-primary text-white'
+                        : 'text-gray-400 hover:text-orange-primary hover:bg-gray-900'
+                    }`}
+                  >
+                    Yazarlar
                   </button>
                 </>
               ) : null}
@@ -1493,6 +1616,187 @@ const Home = () => {
                 </table>
               </div>
             </div>
+          ) : user?.role === 'ADMIN' && adminTab === 'authors' ? (
+            // Admin - Yazarlar
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-2xl font-bold text-orange-primary">
+                  {searchQuery.trim()
+                    ? `Arama Sonuçları: "${searchQuery}" (${filterAuthorsBySearch(adminAuthors).length} yazar)`
+                    : 'Yazarlar'}
+                </h2>
+                <button
+                  onClick={() => {
+                    setModalType('author')
+                    setEditingItem(null)
+                    setAuthorForm({
+                      name: '',
+                      birthYear: '',
+                      nationality: '',
+                      biography: ''
+                    })
+                    setShowModal(true)
+                  }}
+                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded transition-colors"
+                >
+                  + Yeni Ekle
+                </button>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filterAuthorsBySearch(adminAuthors).map((author) => (
+                  <div
+                    key={author.authorId}
+                    className="bg-gray-900 border border-orange-primary/20 p-4 rounded-lg flex flex-col justify-between"
+                  >
+                    <div>
+                      <h3 className="text-lg font-bold text-white">{author.name}</h3>
+                      <p className="text-sm text-gray-400 mt-1">
+                        {author.birthYear ? `Doğum Yılı: ${author.birthYear}` : 'Doğum yılı belirtilmemiş'}
+                      </p>
+                      {author.nationality && (
+                        <p className="text-sm text-gray-400 mt-1">
+                          Ülke: {author.nationality}
+                        </p>
+                      )}
+                      {author.biography && (
+                        <p className="text-sm text-gray-500 mt-2 line-clamp-3">
+                          {author.biography}
+                        </p>
+                      )}
+                    </div>
+                    <div className="flex gap-2 mt-4">
+                      <button
+                        onClick={() => {
+                          setModalType('author')
+                          setEditingItem(author)
+                          setAuthorForm({
+                            name: author.name || '',
+                            birthYear: author.birthYear || '',
+                            nationality: author.nationality || '',
+                            biography: author.biography || ''
+                          })
+                          setShowModal(true)
+                        }}
+                        className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Düzenle
+                      </button>
+                      <button
+                        onClick={() => handleDelete('author', author.authorId)}
+                        className="flex-1 bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition-colors"
+                      >
+                        Sil
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ) : user?.role === 'ADMIN' && adminTab === 'borrowings' ? (
+            // Admin - Ödünçler
+            <div>
+              <h2 className="text-2xl font-bold text-orange-primary mb-6">
+                {searchQuery.trim()
+                  ? `Arama Sonuçları: "${searchQuery}" (${filterBorrowingsBySearch(adminBorrowings).length} ödünç)`
+                  : 'Tüm Ödünç İşlemleri'}
+              </h2>
+              <div className="space-y-4">
+                {filterBorrowingsBySearch(adminBorrowings).map((borrowing) => (
+                  <div
+                    key={borrowing.borrowingId}
+                    className={`bg-gray-900 border border-orange-primary/20 p-4 rounded-lg ${
+                      isOverdue(borrowing.dueDate) && borrowing.returnDate === null
+                        ? 'border-2 border-red-500'
+                        : ''
+                    }`}
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <h3 className="text-lg font-bold text-white">
+                          {borrowing.book?.title}
+                        </h3>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Kullanıcı: {borrowing.user?.fullName || borrowing.user?.username}
+                        </p>
+                        <p className="text-sm text-gray-400 mt-1">
+                          Durum: <span className="font-semibold">{borrowing.status}</span>
+                        </p>
+                        <div className="mt-2 text-sm text-gray-400">
+                          <p>Ödünç Tarihi: {formatDate(borrowing.borrowDate)}</p>
+                          <p
+                            className={
+                              isOverdue(borrowing.dueDate) && borrowing.returnDate === null
+                                ? 'text-red-400 font-bold'
+                                : ''
+                            }
+                          >
+                            İade Tarihi: {formatDate(borrowing.dueDate)}
+                          </p>
+                          {borrowing.returnDate && (
+                            <p className="text-green-400">
+                              İade Edildi: {formatDate(borrowing.returnDate)}
+                            </p>
+                          )}
+                          {isOverdue(borrowing.dueDate) && borrowing.returnDate === null && (
+                            <p className="text-red-400 font-bold mt-2">
+                              ⚠️ İade tarihi geçmiş!
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+                {filterBorrowingsBySearch(adminBorrowings).length === 0 && (
+                  <div className="text-center text-gray-400 py-12">
+                    Kayıtlı ödünç işlemi bulunamadı.
+                  </div>
+                )}
+              </div>
+            </div>
+          ) : user?.role === 'ADMIN' && adminTab === 'penalties' ? (
+            // Admin - Cezalar
+            <div>
+              <h2 className="text-2xl font-bold text-orange-primary mb-6">
+                {searchQuery.trim()
+                  ? `Arama Sonuçları: "${searchQuery}" (${filterPenaltiesBySearch(adminPenalties).length} ceza)`
+                  : 'Tüm Ceza İşlemleri'}
+              </h2>
+              <div className="space-y-4">
+                {filterPenaltiesBySearch(adminPenalties).map((penalty) => (
+                  <div
+                    key={penalty.penaltyId}
+                    className="bg-gray-900 border border-red-500/30 p-4 rounded-lg border-l-4 border-red-500"
+                  >
+                    <h3 className="text-lg font-bold text-white">
+                      {penalty.borrowing?.book?.title}
+                    </h3>
+                    <p className="text-sm text-gray-400 mt-1">
+                      Kullanıcı: {penalty.user?.fullName || penalty.user?.username}
+                    </p>
+                    <div className="mt-2 text-sm text-gray-400">
+                      <p>Ceza Miktarı: {penalty.amount} TL</p>
+                      <p>Gecikme Günü: {penalty.overdueDays}</p>
+                      <p>Oluşturulma Tarihi: {formatDate(penalty.createdAt)}</p>
+                      {penalty.paymentDate && (
+                        <p>Ödeme Tarihi: {formatDate(penalty.paymentDate)}</p>
+                      )}
+                      <p className="mt-2">
+                        Durum:{' '}
+                        <span className={penalty.paid ? 'text-green-400' : 'text-red-400'}>
+                          {penalty.paid ? 'Ödendi' : 'Ödenmedi'}
+                        </span>
+                      </p>
+                    </div>
+                  </div>
+                ))}
+                {filterPenaltiesBySearch(adminPenalties).length === 0 && (
+                  <div className="text-center text-gray-400 py-12">
+                    Kayıtlı ceza işlemi bulunamadı.
+                  </div>
+                )}
+              </div>
+            </div>
           ) : null}
 
           {/* Modal */}
@@ -1501,7 +1805,13 @@ const Home = () => {
               <div className="bg-gray-900 border border-orange-primary/30 rounded-lg max-w-3xl w-full max-h-[90vh] overflow-hidden flex flex-col">
                 <div className="p-6 border-b border-orange-primary/30">
                   <h3 className="text-xl font-bold text-orange-primary">
-                    {editingItem ? 'Kitap Düzenle' : 'Yeni Kitap Ekle'}
+                    {modalType === 'book'
+                      ? (editingItem ? 'Kitap Düzenle' : 'Yeni Kitap Ekle')
+                      : modalType === 'category'
+                        ? (editingItem ? 'Kategori Düzenle' : 'Yeni Kategori Ekle')
+                        : modalType === 'user'
+                          ? (editingItem ? 'Kullanıcı Düzenle' : 'Yeni Kullanıcı Ekle')
+                          : (editingItem ? 'Yazar Düzenle' : 'Yeni Yazar Ekle')}
                   </h3>
                 </div>
                 <div className="overflow-y-auto p-6 flex-1">
@@ -1736,7 +2046,7 @@ const Home = () => {
                         </button>
                       </div>
                     </form>
-                  ) : (
+                  ) : modalType === 'user' ? (
                     <form onSubmit={handleUserSubmit} className="space-y-4">
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                         <div>
@@ -1846,6 +2156,115 @@ const Home = () => {
                           />
                           <label className="ml-2 text-gray-300">Aktif</label>
                         </div>
+                      </div>
+                      <div className="flex gap-2 pt-4 border-t border-orange-primary/30">
+                        <button
+                          type="button"
+                          onClick={() => setShowModal(false)}
+                          className="flex-1 bg-gray-700 hover:bg-gray-600 text-white px-4 py-2 rounded transition-colors"
+                        >
+                          İptal
+                        </button>
+                        <button
+                          type="submit"
+                          disabled={saving}
+                          className="flex-1 bg-orange-primary hover:bg-orange-dark text-white px-4 py-2 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          {saving ? 'Kaydediliyor...' : editingItem ? 'Güncelle' : 'Ekle'}
+                        </button>
+                      </div>
+                    </form>
+                  ) : (
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault()
+                        try {
+                          setSaving(true)
+                          const payload = {
+                            name: authorForm.name,
+                            birthYear: authorForm.birthYear ? parseInt(authorForm.birthYear) : null,
+                            nationality: authorForm.nationality || null,
+                            biography: authorForm.biography || null
+                          }
+
+                          if (editingItem && modalType === 'author') {
+                            await authorsAPI.update(editingItem.authorId, payload)
+                          } else {
+                            await authorsAPI.create(payload)
+                          }
+
+                          setShowModal(false)
+                          setEditingItem(null)
+                          await loadAdminData()
+                        } catch (error) {
+                          alert('Yazar kaydedilirken hata: ' + (error.response?.data?.message || error.message))
+                        } finally {
+                          setSaving(false)
+                        }
+                      }}
+                      className="space-y-4"
+                    >
+                      <div>
+                        <label className="block text-gray-300 mb-2">Yazar Adı *</label>
+                        <input
+                          type="text"
+                          value={authorForm.name}
+                          onChange={(e) =>
+                            setAuthorForm((prev) => ({
+                              ...prev,
+                              name: e.target.value,
+                            }))
+                          }
+                          className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          required
+                        />
+                      </div>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label className="block text-gray-300 mb-2">Doğum Yılı</label>
+                          <input
+                            type="number"
+                            value={authorForm.birthYear}
+                            onChange={(e) =>
+                              setAuthorForm((prev) => ({
+                                ...prev,
+                                birthYear: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                            min="1000"
+                            max="2100"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-gray-300 mb-2">Ülke</label>
+                          <input
+                            type="text"
+                            value={authorForm.nationality}
+                            onChange={(e) =>
+                              setAuthorForm((prev) => ({
+                                ...prev,
+                                nationality: e.target.value,
+                              }))
+                            }
+                            className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-gray-300 mb-2">Biyografi</label>
+                        <textarea
+                          value={authorForm.biography}
+                          onChange={(e) =>
+                            setAuthorForm((prev) => ({
+                              ...prev,
+                              biography: e.target.value,
+                            }))
+                          }
+                          className="w-full px-4 py-2 bg-gray-800 border border-orange-primary/30 rounded text-white focus:outline-none focus:ring-2 focus:ring-orange-primary"
+                          rows="4"
+                          placeholder="Yazar hakkında kısa bilgi..."
+                        />
                       </div>
                       <div className="flex gap-2 pt-4 border-t border-orange-primary/30">
                         <button

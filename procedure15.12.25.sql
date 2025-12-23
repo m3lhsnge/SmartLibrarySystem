@@ -1,7 +1,7 @@
 USE Kutuphane;
 GO
 
--- Eğer prosedür önceden varsa sil (Temiz kurulum)
+-- E�er prosed�r �nceden varsa sil (Temiz kurulum)
 IF OBJECT_ID('sp_CalculatePenaltyForReturn', 'P') IS NOT NULL 
     DROP PROCEDURE sp_CalculatePenaltyForReturn;
 GO
