@@ -29,7 +29,7 @@ public class BorrowingServiceImpl implements BorrowingService {
 
     // ödünç verme işlemleri
     @Override
-    @Transactional
+    @Transactional //işlemler olumlu giderse kaydet yoksa rollback yap
     public Borrowing borrowBook(Long userId, Long bookId, String notes) {
         //kullanıcıyı bul
         User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı!"));
@@ -52,7 +52,8 @@ public class BorrowingServiceImpl implements BorrowingService {
         borrowing.setUser(user);
         borrowing.setBook(book);
         borrowing.setBorrowDate(LocalDateTime.now());
-        // DEMO İÇİN: Ödünç süresini 1 dakikaya düşürdük (sunum sonrası tekrar gün yapabilirsiniz)
+
+        // DEMO İÇİN: Ödünç süresini 1 dakikaya düşürüldü
         borrowing.setDueDate(LocalDateTime.now().plusMinutes(1));
         borrowing.setStatus(BorrowingStatus.BORROWED);
         borrowing.setNotes(notes);

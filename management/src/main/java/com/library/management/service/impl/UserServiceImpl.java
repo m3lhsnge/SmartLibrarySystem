@@ -107,8 +107,7 @@ public class UserServiceImpl implements UserService {
     }
     @Override
     public void forgotPassword(String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Bu mail adresiyle kayıtlı kullanıcı bulunamadı."));
+        User user = userRepository.findByEmail(email).orElseThrow(() -> new RuntimeException("Bu mail adresiyle kayıtlı kullanıcı bulunamadı."));
 
         // Rastgele token üret ve kaydet (VerificationToken alanını tekrar kullanabiliriz)
         String token = java.util.UUID.randomUUID().toString();
@@ -121,8 +120,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void resetPassword(String token, String newPassword) {
-        User user = userRepository.findByVerificationToken(token)
-                .orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş link!"));
+        User user = userRepository.findByVerificationToken(token).orElseThrow(() -> new RuntimeException("Geçersiz veya süresi dolmuş link!"));
 
         // yeni şifreyi hashle ve kaydet
         user.setPasswordHash(passwordEncoder.encode(newPassword));
@@ -139,8 +137,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public User login(String username, String password) {
         // kullanıcıyı bulma
-        User user = userRepository.findByUsername(username)
-                .orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
+        User user = userRepository.findByUsername(username).orElseThrow(() -> new RuntimeException("Kullanıcı adı veya şifre hatalı!"));
 
         // şifreyi kontrol etme
         if (!passwordEncoder.matches(password, user.getPasswordHash())) {
