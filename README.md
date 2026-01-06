@@ -30,16 +30,19 @@
 
  ### Backend:
   - *Flask, Spring Boot veya .NET ile API uç noktaları (GET/POST/PUT/DELETE)*
+  >*Bu projede SpringBoot kullanılmıştır*
   - *Katmanlı mimari: Entity, Repository, Service, Controller*
   - *JWT tabanlı kimlik doğrulama*
   - *E-posta bildirim sistemi (geç iade)*
 
  ### Veritabanı:
   - *MSSQL, MySQL veya PostgreSQL tercih edilebilir*
+  >*Bu projede MSSQL kullanılmıştır*
 
  ### Frontend:
   - *Öğrenci, API'leri kullanan işlevsel bir kullanıcı arayüzü geliştirmelidir*
   - *Frontend teknolojisi olarak HTML/CSS + JavaScript, Thymeleaf (Spring) kullanılabilir*
+  >*Bu projede React kullanılmıştır*
   - *Giriş (login), kitap arama/listeleme, ödünç alma/iade, admin CRUD gibi temel ekranlar yer*
   - *almalıdır*
 
