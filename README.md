@@ -1,6 +1,5 @@
 
-># Lütfen merak ettiğiniz,düzeltilmesini istediğiniz,"Bu şekilde yapsan daha iyi olur..." gibi durumları belirtiniz.
-
+># Lütfen merak ettiğiniz,düzeltilmesini istediğiniz durumları belirtiniz.
 
 # Proje Adı: 
 ## Akıllı Kütüphane Yönetim Sistemi
@@ -58,6 +57,10 @@
   - *kullanım senaryoları öğrencinin kendi katkısıyla geliştirilecektir*
 
 
+
+## Java springboot kullanılarak yapılan kütüphane yönetim sistemi uygulamasıdır.Backend tarafında restapier ile front-back bağıntısı kurulmuştur.
+## Database tarafında MSSQL tercih edilmiştir.
+## Katmanlı mimari ile güvenlik ve kullanıcı deneyimi iyileştirilerek optimize edilmiştir.
 
 
 #### *Made by:* 
