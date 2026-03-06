@@ -58,10 +58,13 @@
 
 
 
-## Java springboot kullanılarak yapılan kütüphane yönetim sistemi uygulamasıdır.Backend tarafında restapier ile front-back bağıntısı kurulmuştur.
+## Java springboot kullanılarak yapılan kütüphane yönetim sistemi uygulamasıdır.
+## Backend tarafında restapi'ler ile front-back bağıntısı kurulmuştur.
 ## Database tarafında MSSQL tercih edilmiştir.
 ## Katmanlı mimari ile güvenlik ve kullanıcı deneyimi iyileştirilerek optimize edilmiştir.
+## Kütüphane tarafında:Kitap,Kategori,Yazar;Admin tarafında:Kullanıcı için CRUD işlemleri sorunsuz çalışmaktadır.
+## Database kısmında trigger ile birlikte kitap ödünç işlemleri ve ceza yönetimi düzenlenmiştir. 
 
 
 #### *Made by:* 
-##### __*Melih Aka 445870*__
+##### __*Melih Aka*__
